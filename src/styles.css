@@ -1,0 +1,11 @@
+html,
+body,
+#root,
+#App {
+  overflow-x: hidden;
+}
+
+#graph {
+  height: 600px;
+  width: 100%;
+}
