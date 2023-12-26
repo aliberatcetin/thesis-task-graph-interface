@@ -67,13 +67,23 @@ export default class ApiService extends HttpService {
     try {
       const response = await this
           .getAdapter()
-          .get(`graph/${target}/${source}`);
+          .delete(`graph/${target}/${source}`);
       return response.data;
     } catch (error) {
       console.log(error);
     }
   }
 
+  async isTherePath(target,source){
+    try {
+      const response = await this
+          .getAdapter()
+          .get(`graph/${target}/${source}`);
+      return response.data;
+    } catch (error) {
+      console.log(error);
+    }
+  }
 
 
 

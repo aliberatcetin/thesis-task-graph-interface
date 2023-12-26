@@ -152,12 +152,15 @@ export default class Graph extends React.Component {
             task: SORT,
             type: "task"
         };
-        console.log("create", node);
-        this.setState(state => {
-            state.graph.nodes = state.graph.nodes.concat(node);
-            return state;
+
+
+        services.apiService.createNode(node).then(r => {
+            console.log("create", r);
+            this.setState(state => {
+                state.graph.nodes = state.graph.nodes.concat(r);
+                return state;
+            });
         });
-        services.apiService.createNode(node).then(r => console.log(r));
     };
 
     onSelectNode = node => {
@@ -220,20 +223,33 @@ export default class Graph extends React.Component {
             type
         };
 
-        // Only add the edge when the source node is not the same as the target
-        if (viewEdge.source !== viewEdge.target) {
-            if(targetViewNode.hasOwnProperty("dependencies"))
+
+        if (viewEdge.source === viewEdge.target) {
+            return;
+        }
+
+        services.apiService.isTherePath(targetViewNode.id, sourceViewNode.id).then(r => {
+            if(r === true){
+                return;
+            }
+            if (targetViewNode.hasOwnProperty("dependencies"))
                 targetViewNode["dependencies"].push(sourceViewNode);
             else
                 targetViewNode["dependencies"] = [sourceViewNode]
-            services.apiService.updateNode(targetViewNode).then(r => console.log(r));
 
-            graph.edges = [...graph.edges, viewEdge];
-            this.setState({
-                graph,
-                selected: viewEdge
+
+            services.apiService.updateNode(targetViewNode).then(r => {
+                console.log(r);
+                graph.edges = [...graph.edges, viewEdge];
+                this.setState({
+                    graph,
+                    selected: viewEdge
+                });
             });
-        }
+        });
+
+
+
     };
 
     onSwapEdge = () => {
