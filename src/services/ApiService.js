@@ -41,6 +41,17 @@ export default class ApiService extends HttpService {
     }
   }
 
+  async runNode(node) {
+    try {
+      const response = await this
+          .getAdapter()
+          .post(`/graph/run`, node);
+      return response.data;
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
   async updateNode(node) {
     try {
       const response = await this
