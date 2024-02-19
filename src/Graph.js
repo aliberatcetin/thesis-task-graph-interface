@@ -11,6 +11,7 @@ const TYPES = {
     [FILE]: FILE,
     [NODE]: NODE
 };
+const INTERVAL_TIMEOUT = 200;
 const NODE_STATES = {
     SELECTED: "SELECTED",
     READY: "READY",
@@ -153,7 +154,8 @@ export default class Graph extends React.Component {
 
         document.addEventListener("keydown", this.keypress, false);
 
-        var intervalId = setInterval(this.setGraph, 2000);
+        clearInterval(this.state.intervalId);
+        var intervalId = setInterval(this.setGraph, INTERVAL_TIMEOUT);
         this.setState({intervalId:intervalId});
         // store intervalId in the state so it can be accessed later:
         //this.setState({intervalId: intervalId});
@@ -190,7 +192,8 @@ export default class Graph extends React.Component {
         const selected = this.state.selected;
         console.log("select node", node);
         if(node===null){
-            var interval = setInterval(this.setGraph,2000);
+            clearInterval(this.state.intervalId);
+            var interval = setInterval(this.setGraph,INTERVAL_TIMEOUT);
             this.setState({intervalId:interval});
         }else{
             clearInterval(this.state.intervalId);
@@ -394,20 +397,20 @@ export default class Graph extends React.Component {
         const graph = this.state.graph;
         const selected = this.state.selected;
 
-        const type = e.target.value;
+        const task = e.target.value;
 
-        if (type in TYPES) {
-            selected.type = type;
 
-            const i = this.getNodeIndex(selected);
-            graph.nodes[i].type = type;
-            services.apiService.updateNode(graph.nodes[i]).then(r => console.log(r));
+        selected.task = task;
 
-            this.setState({
-                graph,
-                selected
-            });
-        }
+        const i = this.getNodeIndex(selected);
+        graph.nodes[i].task = task;
+        services.apiService.updateNode(graph.nodes[i]).then(r => console.log(r));
+
+        this.setState({
+            graph,
+            selected
+        });
+
     };
 
     updateSelectedDataType = e => {
@@ -479,6 +482,10 @@ export default class Graph extends React.Component {
         this.setState({
             graph
         });
+    }
+
+    runTaskBulk = () => {
+        services.apiService.runNodeBulk();
     }
 
     render() {
@@ -560,7 +567,9 @@ export default class Graph extends React.Component {
                         onDeleteEdge={this.onDeleteEdge}
                     />
                 </div>
-
+                <button style={{zIndex: 9999}} onClick={() => this.runTaskBulk()}>
+                    RUN ALL
+                </button>
                 {selected && (
                     <div style={{display: "flex", flexDirection: "column", marginBottom: 50, alignItems: "center"}}>
                         <div style={{width: "50%"}}>
@@ -571,15 +580,15 @@ export default class Graph extends React.Component {
                                 <span>Task: </span>
                                 <input
                                     type="text"
-                                    value={selected.title}
-                                    onChange={this.updateSelectedNodeTitle}
-                                />
-                                <select
-                                    value={selected.type}
+                                    value={selected.task}
                                     onChange={this.updateSelectedTaskType}
-                                >
-                                    <option value={SORT}>Sort</option>
-                                </select>
+                                />
+                                {/*<select*/}
+                                {/*    value={selected.type}*/}
+                                {/*    onChange={this.updateSelectedTaskType}*/}
+                                {/*>*/}
+                                {/*    <option value={SORT}>Sort</option>*/}
+                                {/*</select>*/}
                             </div>
                             <div>
                                 <span>Input: </span>

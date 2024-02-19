@@ -52,6 +52,17 @@ export default class ApiService extends HttpService {
     }
   }
 
+  async runNodeBulk() {
+    try {
+      const response = await this
+          .getAdapter()
+          .get(`/graph/run/bulk`);
+      return response.data;
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
   async updateNode(node) {
     try {
       const response = await this
