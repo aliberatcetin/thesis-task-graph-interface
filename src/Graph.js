@@ -70,7 +70,7 @@ const GraphConfig = {
             /*shape: (
               <symbol viewBox="0 0 50 50" id="emptyEdge" key="0">
                 <circle cx="25" cy="25" r="8" fill="currentColor">
-                  {" "}
+                  {""}
                 </circle>
               </symbol>
             )*/
@@ -265,13 +265,12 @@ export default class Graph extends React.Component {
             if (r === true) {
                 return;
             }
-            if (targetViewNode.hasOwnProperty("dependencies"))
-                targetViewNode["dependencies"].push(sourceViewNode);
+            if (sourceViewNode.hasOwnProperty("dependencies"))
+                sourceViewNode["dependencies"].push(targetViewNode);
             else
-                targetViewNode["dependencies"] = [sourceViewNode]
+                sourceViewNode["dependencies"] = [targetViewNode]
 
-
-            services.apiService.updateNode(targetViewNode).then(r => {
+            services.apiService.updateNode(sourceViewNode).then(r => {
                 console.log(r);
                 graph.edges = [...graph.edges, viewEdge];
                 this.setState({
@@ -363,9 +362,8 @@ export default class Graph extends React.Component {
         selected.title = title;
 
         const i = this.getNodeIndex(selected);
-        services.apiService.updateNode(graph.nodes[i]).then(r => console.log(r));
-
         graph.nodes[i].title = title;
+        services.apiService.updateNode(graph.nodes[i]).then(r => console.log(r));
 
         this.setState({
             graph,
@@ -477,7 +475,6 @@ export default class Graph extends React.Component {
     runTask = () => {
         var node = this.state.lastSelectedElement;
         const i = this.getNodeIndex(node);
-        graph.nodes[i].taskState = NODE_STATES.RUNNING;
         services.apiService.runNode(node).then(r => console.log(r));
         this.setState({
             graph
@@ -486,6 +483,9 @@ export default class Graph extends React.Component {
 
     runTaskBulk = () => {
         services.apiService.runNodeBulk();
+    }
+    clearAll = () => {
+        services.apiService.clearAll();
     }
 
     render() {
@@ -537,14 +537,13 @@ export default class Graph extends React.Component {
                                     }}>
 
 
-                                        <p style={{fontSize: 13, fontWeight: "bold"}}>{data.title}: {data.task}</p>
-                                        <p style={{fontSize: 13, fontWeight: "bold"}}>input: {data.input}</p>
-                                        <p style={{fontSize: 13, fontWeight: "bold"}}>output: {data.output}</p>
+                                        <p style={{fontSize: 13, fontWeight: "bold"}}>Task: {data.task}</p>
+                                        <p style={{fontSize: 13, fontWeight: "bold"}}>input: {data.input.substr(0,10)}</p>
+                                        <p style={{fontSize: 13, fontWeight: "bold"}}>output: {data.output.substr(0,10)}</p>
                                         <p style={{fontSize: 13, fontWeight: "bold"}}>input
                                             source: {TYPES[data.inputSource]}</p>
 
-                                        <p style={{fontSize: 13, fontWeight: "bold"}}>Data
-                                            type: {DATA_TYPES[data.dataType]}</p>
+                                        <p style={{fontSize: 13, fontWeight: "bold"}}>Title: {data.title}</p>
 
                                         <p style={{fontSize: 13, fontWeight: "bold"}}>Run log
                                             : {DATA_TYPES[data.runLog]}</p>
@@ -553,6 +552,7 @@ export default class Graph extends React.Component {
                                 </foreignObject>
                             )
                         }}
+
                         selected={selected}
                         nodeTypes={NodeTypes}
                         nodeSubtypes={NodeSubtypes}
@@ -569,6 +569,9 @@ export default class Graph extends React.Component {
                 </div>
                 <button style={{zIndex: 9999}} onClick={() => this.runTaskBulk()}>
                     RUN ALL
+                </button>
+                <button style={{zIndex: 9999}} onClick={() => this.clearAll()}>
+                    CLEAR ALL
                 </button>
                 {selected && (
                     <div style={{display: "flex", flexDirection: "column", marginBottom: 50, alignItems: "center"}}>
@@ -611,13 +614,13 @@ export default class Graph extends React.Component {
                             </div>
 
                             <div>
-                                <span>Data Type: </span>
-                                <select
-                                    value={selected.dataType}
-                                    onChange={this.updateSelectedDataType}
-                                >
-                                    <option value={DATA_TYPES.INTEGER}>INTEGER</option>
-                                </select>
+                                <span>Title: </span>
+                                <input
+                                    type="text"
+                                    value={selected.title}
+                                    onChange={this.updateSelectedNodeTitle}
+                                />
+
 
                             </div>
 

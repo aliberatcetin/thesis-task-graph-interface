@@ -63,6 +63,17 @@ export default class ApiService extends HttpService {
     }
   }
 
+  async clearAll() {
+    try {
+      const response = await this
+          .getAdapter()
+          .get(`/graph/clearall`);
+      return response.data;
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
   async updateNode(node) {
     try {
       const response = await this
