@@ -487,6 +487,9 @@ export default class Graph extends React.Component {
     clearAll = () => {
         services.apiService.clearAll();
     }
+    terminate = () => {
+        services.apiService.terminate();
+    }
 
     render() {
         const nodes = this.state.graph.nodes;
@@ -572,6 +575,9 @@ export default class Graph extends React.Component {
                 </button>
                 <button style={{zIndex: 9999}} onClick={() => this.clearAll()}>
                     CLEAR ALL
+                </button>
+                <button style={{zIndex: 9999}} onClick={() => this.terminate()}>
+                    TERMINATE
                 </button>
                 {selected && (
                     <div style={{display: "flex", flexDirection: "column", marginBottom: 50, alignItems: "center"}}>
